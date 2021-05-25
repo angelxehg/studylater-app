@@ -1,0 +1,6 @@
+{
+	"appId": "com.angelxehg.studylater",
+	"appName": "StudyLater",
+	"webDir": "build",
+	"bundledWebRuntime": false
+}
