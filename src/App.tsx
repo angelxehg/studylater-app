@@ -1,5 +1,9 @@
 import React from 'react';
+import { AuthCheck } from 'reactfire';
 import Container from 'react-bootstrap/Container';
+
+import LoginPage from './pages/Login';
+import HomePage from './pages/Home';
 
 function App() {
   return (
@@ -8,6 +12,9 @@ function App() {
         <h1>StudyLater App v0.1.1</h1>
         <p>Hola mundo!</p>
       </header>
+      <AuthCheck fallback={<LoginPage />}>
+        <HomePage />
+      </AuthCheck>
     </Container>
   );
 }

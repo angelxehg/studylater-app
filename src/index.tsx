@@ -1,17 +1,19 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { FirebaseAppProvider } from 'reactfire';
+import 'firebase/auth';
 import './styles.scss';
 import App from './App';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import reportWebVitals from './reportWebVitals';
 import firebaseConfig from './firebaseConfig';
 
-console.log(firebaseConfig);
-
 ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
+  <FirebaseAppProvider firebaseConfig={firebaseConfig}>
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>
+  </FirebaseAppProvider>,
   document.getElementById('root')
 );
 
