@@ -5,6 +5,7 @@ import Container from 'react-bootstrap/Container';
 import LoginPage from './pages/Login';
 import DocumentsPage from './pages/Documents';
 import AccountPage from './pages/Account';
+import StoreContextProvider from './components/Store';
 
 function App() {
   return (
@@ -14,7 +15,9 @@ function App() {
         <p>Lleva contigo tus PDFs y estudia más tarde</p>
       </header>
       <AuthCheck fallback={<LoginPage />}>
-        <DocumentsPage />
+        <StoreContextProvider>
+          <DocumentsPage />
+        </StoreContextProvider>
         <AccountPage />
       </AuthCheck>
     </Container>
