@@ -1,11 +1,14 @@
 import React from 'react';
+import Button from 'react-bootstrap/Button';
 
-const LoginPage = () => {
-  return (
-    <main>
-      Debe iniciar sesión
-    </main>
-  )
-}
+import { loginWithGoogle } from '../functions/auth';
+
+const LoginPage = () => (
+  <main>
+    <Button onClick={loginWithGoogle}>
+      Iniciar sesión con Google
+    </Button>
+  </main>
+)
 
 export default LoginPage;
