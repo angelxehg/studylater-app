@@ -11,18 +11,31 @@ interface MainDocModel {
 }
 
 
-interface DocumentRef {
+export interface DocumentRef {
   name: string
   url: string
   offline: boolean
 }
 
+export interface DocumentPath {
+  url: string
+  local: string
+}
+
 type StoreContextType = {
   documents: DocumentRef[]
+  download: (i: DocumentRef) => void
+  remove: (i: DocumentRef) => void
 }
 
 const defaultStoreContext: StoreContextType = {
-  documents: []
+  documents: [],
+  download: (i: DocumentRef) => {
+    throw new Error('download not implemented')
+  },
+  remove: (i: DocumentRef) => {
+    throw new Error('remove not implemented')
+  },
 }
 
 const StoreContext = createContext<StoreContextType>(defaultStoreContext);
@@ -38,24 +51,43 @@ const StoreContextProvider = (props: StoreContextProviderProps) => {
   const mainDocRef = useFirestore()
     .collection('studylater').doc(user.uid);
   const { data: mainData } = useFirestoreDocData<MainDocModel>(mainDocRef);
+
   const [documentItems, setDocumentItems] = useState<DocumentRef[]>([]);
+  const [availablePaths, setAvailablePaths] = useState<DocumentPath[]>([]);
+
+  const downloadDocument = (d: DocumentRef) => {
+    console.log(`Descargando ${d.url}`);
+    setAvailablePaths(availablePaths.concat([{
+      url: d.url,
+      local: '...'
+    }]))
+  }
+
+  const removeDocument = (d: DocumentRef) => {
+    console.log(`Eliminando ${d.url}`);
+    setAvailablePaths(availablePaths
+      .filter(i => i.url !== d.url)
+    )
+  }
 
   useEffect(() => {
     if (mainData.documents) {
-      console.log('Apply changes...');
+      const availableUrls = availablePaths.map(i => i.url);
       setDocumentItems(mainData.documents.map(item => {
         return {
           name: item.name,
           url: item.url,
-          offline: false
+          offline: availableUrls.includes(item.url),
         }
       }))
     }
-  }, [mainData]);
+  }, [mainData, availablePaths]);
 
   return (
     <StoreContext.Provider value={{
-      documents: documentItems
+      documents: documentItems,
+      download: downloadDocument,
+      remove: removeDocument
     }}>
       {props.children}
     </StoreContext.Provider>
