@@ -54,7 +54,46 @@ REACT_APP_FIREBASE_APP_ID=
 REACT_APP_FIREBASE_WEB_CLIENT_TYPE3=
 ```
 
-## Instalación en Dispositivos
+## Probar en Dispositivos
+
+Compilar y probar aplicación en dispositivos:
+
+- Compilar assets: `npm run build`
+
+- Copiar assets y actualizar plugins:
+
+  - Android: `npx cap sync android`
+
+  - iOS: `npx cap sync ios`
+
+Ejecutar `npm run start`, e incluir la url pública en el archivo `capacitor.config.ts`:
+
+```ts
+const config: CapacitorConfig = {
+  server: {
+    url: "http://192.168.0.63:3000",
+    cleartext: true
+  },
+};
+```
+
+NOTA: Deberas revertir este cambio cuando dejes de usar LiveReload, o quieras generar una versión para producción
+
+- Ver dispositivos disponibles:
+
+  - Android: `npx cap run android --list`
+
+  - iOS: `npx cap run ios --list`
+
+- Ejecutar en dispositivo:
+
+  - Android: `npx cap run android --target [ID de Target]`
+
+  - iOS: `npx cap run ios --target [ID de Target]`
+
+Consulta más sobre [LiveReload](https://capacitorjs.com/docs/guides/live-reload)
+
+## Generar versión de Producción
 
 Compilar y probar aplicación en dispositivos:
 
