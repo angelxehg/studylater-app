@@ -1,12 +1,11 @@
 import React from 'react';
-import { useUser } from 'reactfire';
 
 const HomePage = () => {
-  const { data: user } = useUser();
   return (
-    <main>
-      Ya inició sesión como {user.displayName}
-    </main>
+    <section>
+      <h2>Inicio</h2>
+      <p>Hola mundo</p>
+    </section>
   )
 }
 
