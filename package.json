@@ -38,6 +38,7 @@
     "cordova-plugin-file-opener2": "^3.0.5",
     "cordova-plugin-googleplus": "^8.5.2",
     "firebase": "^8.6.2",
+    "jetifier": "^2.0.0",
     "node-sass": "^6.0.0",
     "react": "^17.0.2",
     "react-bootstrap": "^2.0.0-alpha.2",

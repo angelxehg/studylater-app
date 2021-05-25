@@ -60,6 +60,8 @@ Compilar y probar aplicación en dispositivos:
 
 - Compilar assets: `npm run build`
 
+- Ejecutar Jetifier: `npx jetify`. Sin este paso, la compilación en android [fallará](https://github.com/pwlin/cordova-plugin-file-opener2/issues/256#issuecomment-657574795)
+
 - Copiar assets y actualizar plugins:
 
   - Android: `npx cap sync android`
@@ -98,6 +100,8 @@ Consulta más sobre [LiveReload](https://capacitorjs.com/docs/guides/live-reload
 Compilar y probar aplicación en dispositivos:
 
 - Compilar assets: `npm run build`
+
+- Ejecutar Jetifier: `npx jetify`. Sin este paso, la compilación en android [fallará](https://github.com/pwlin/cordova-plugin-file-opener2/issues/256#issuecomment-657574795)
 
 - Copiar assets y actualizar plugins:
 
