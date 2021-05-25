@@ -12,13 +12,14 @@ export const loginWithGoogle = async () => {
     // Usar popup en web (Navegador)
     return await firebase.auth().signInWithPopup(googleProvider);
   }
-  const user = await GooglePlus.login({
+  const userCredential: { idToken: string } = await GooglePlus.login({
     scopes: '',
     webClientId: firebaseConfig.webClientType3,
     offline: true
   });
-  console.log(user);
-  return user;
+  return firebase.auth().signInWithCredential(
+    firebase.auth.GoogleAuthProvider.credential(userCredential.idToken)
+  )
 }
 
 export const logout = async () => {
