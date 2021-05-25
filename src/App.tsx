@@ -3,7 +3,7 @@ import { AuthCheck } from 'reactfire';
 import Container from 'react-bootstrap/Container';
 
 import LoginPage from './pages/Login';
-import HomePage from './pages/Home';
+import DocumentsPage from './pages/Documents';
 import AccountPage from './pages/Account';
 
 function App() {
@@ -14,7 +14,7 @@ function App() {
         <p>Lleva contigo tus PDFs y estudia más tarde</p>
       </header>
       <AuthCheck fallback={<LoginPage />}>
-        <HomePage />
+        <DocumentsPage />
         <AccountPage />
       </AuthCheck>
     </Container>

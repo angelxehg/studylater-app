@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { FirebaseAppProvider } from 'reactfire';
 import 'firebase/auth';
+import 'firebase/firestore';
 import './styles.scss';
 import App from './App';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
