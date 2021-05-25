@@ -5,11 +5,11 @@ import Card from 'react-bootstrap/Card';
 import { useStore, DocumentRef } from '../components/Store';
 
 const DocumentsPage = () => {
-  const { documents, download, remove } = useStore();
+  const { documents, download, open } = useStore();
 
   const handleClick = (item: DocumentRef) => {
     if (item.offline) {
-      return () => remove(item);
+      return () => open(item);
     } else {
       return () => download(item);
     }

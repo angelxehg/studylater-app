@@ -24,12 +24,16 @@ export interface DocumentPath {
 
 type StoreContextType = {
   documents: DocumentRef[]
+  open: (i: DocumentRef) => void
   download: (i: DocumentRef) => void
   remove: (i: DocumentRef) => void
 }
 
 const defaultStoreContext: StoreContextType = {
   documents: [],
+  open: (i: DocumentRef) => {
+    throw new Error('open not implemented')
+  },
   download: (i: DocumentRef) => {
     throw new Error('download not implemented')
   },
@@ -46,6 +50,21 @@ interface StoreContextProviderProps {
   children: React.ReactChildren | React.ReactChild
 }
 
+const getPaths = async (): Promise<DocumentPath[]> => {
+  const raw = localStorage.getItem('PATHS');
+  if (!raw) {
+    return [];
+  }
+  try {
+    const items: DocumentPath[] = await JSON.parse(raw);
+    return items;
+  } catch (err) {
+    console.error(err);
+    localStorage.removeItem('PATHS');
+    return [];
+  }
+}
+
 const StoreContextProvider = (props: StoreContextProviderProps) => {
   const { data: user } = useUser();
   const mainDocRef = useFirestore()
@@ -55,22 +74,35 @@ const StoreContextProvider = (props: StoreContextProviderProps) => {
   const [documentItems, setDocumentItems] = useState<DocumentRef[]>([]);
   const [availablePaths, setAvailablePaths] = useState<DocumentPath[]>([]);
 
+  const openDocument = (d: DocumentRef) => {
+    console.log(`Abriendo ${d.url}`);
+  }
+
   const downloadDocument = (d: DocumentRef) => {
     console.log(`Descargando ${d.url}`);
-    setAvailablePaths(availablePaths.concat([{
+    const next = availablePaths.concat([{
       url: d.url,
       local: '...'
-    }]))
+    }]);
+    localStorage.setItem('PATHS', JSON.stringify(next));
+    setAvailablePaths(next);
   }
 
   const removeDocument = (d: DocumentRef) => {
     console.log(`Eliminando ${d.url}`);
-    setAvailablePaths(availablePaths
-      .filter(i => i.url !== d.url)
-    )
+    const next = availablePaths.filter(i => i.url !== d.url);
+    localStorage.setItem('PATHS', JSON.stringify(next));
+    setAvailablePaths(next)
   }
 
   useEffect(() => {
+    getPaths().then(i => setAvailablePaths(i));
+  }, []);
+
+  useEffect(() => {
+    if (!mainData) {
+      return
+    }
     if (mainData.documents) {
       const availableUrls = availablePaths.map(i => i.url);
       setDocumentItems(mainData.documents.map(item => {
@@ -86,6 +118,7 @@ const StoreContextProvider = (props: StoreContextProviderProps) => {
   return (
     <StoreContext.Provider value={{
       documents: documentItems,
+      open: openDocument,
       download: downloadDocument,
       remove: removeDocument
     }}>
