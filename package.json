@@ -1,7 +1,21 @@
 {
   "name": "studylater-app",
   "version": "0.1.0",
+  "author": {
+    "name": "Angel Hurtado",
+    "email": "sudo@angelxehg.com",
+    "url": "https://angelxehg.github.io/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/angelxehg/studylater-app.git"
+  },
+  "license": "MIT",
   "private": true,
+  "keywords": [
+    "react",
+    "firebase"
+  ],
   "dependencies": {
     "@testing-library/jest-dom": "^5.12.0",
     "@testing-library/react": "^11.2.7",
