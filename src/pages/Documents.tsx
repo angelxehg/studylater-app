@@ -1,12 +1,65 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Card from 'react-bootstrap/Card';
-import { useStore } from '../components/Store';
+import { useStore, DocumentRef } from '../components/Store';
+
+interface DocumentCardProps {
+  item: DocumentRef
+}
+
+const DocumentCard = (props: DocumentCardProps) => {
+  const { download, open, remove } = useStore();
+  const { name, url, offline } = props.item;
+  const [waitFor, setWaitFor] = useState<string>();
+
+  const handleAction = async (action: string, fun: (rawUrl: string) => Promise<void>) => {
+    setWaitFor(action);
+    try {
+      await fun(url);
+      setWaitFor(undefined);
+    } catch (err) {
+      console.error(err);
+      setWaitFor('Error!');
+      setTimeout(() => setWaitFor(undefined), 1000);
+    }
+  }
+
+  const handleOpen = () => handleAction('Abriendo...', open);
+
+  const handleRemove = () => handleAction('Eliminando...', remove);
+
+  const handleDownload = () => handleAction('Descargando...', download);
+
+  return (
+    <Card bg="dark" text="light" className="mb-2">
+      <Card.Body>
+        <Card.Title>
+          {name}
+        </Card.Title>
+        {waitFor ? <div>
+          <Button variant="secondary" disabled className="me-2">
+            {waitFor}
+          </Button>
+        </div> : <div>
+          {offline && <Button variant="success" className="me-2" onClick={handleOpen}>
+            Abrir
+          </Button>}
+          {offline && <Button variant="danger" className="me-2" onClick={handleRemove}>
+            Eliminar
+          </Button>}
+          {!offline && <Button variant="primary" className="me-2" onClick={handleDownload}>
+            Descargar
+          </Button>}
+        </div>}
+      </Card.Body>
+    </Card>
+  )
+}
 
 const DocumentsPage = () => {
-  const { documents, download, open, remove } = useStore();
+  const { documents } = useStore();
 
   return (
     <section>
@@ -15,22 +68,7 @@ const DocumentsPage = () => {
         {documents.map((item, n) => {
           return (
             <Col xs="12" key={n}>
-              <Card bg="dark" text="light" className="mb-2">
-                <Card.Body>
-                  <Card.Title>
-                    {item.name}
-                  </Card.Title>
-                  {item.offline && <Button variant="success" className="me-2" onClick={() => open(item.url)}>
-                    Abrir
-                  </Button>}
-                  {item.offline && <Button variant="danger" className="me-2" onClick={() => remove(item.url)}>
-                    Eliminar
-                  </Button>}
-                  {!item.offline && <Button variant="primary" className="me-2" onClick={() => download(item.url)}>
-                    Descargar
-                  </Button>}
-                </Card.Body>
-              </Card>
+              <DocumentCard item={item} />
             </Col>
           )
         })}

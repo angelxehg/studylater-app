@@ -41,9 +41,9 @@ export interface DocumentPath {
 
 type StoreContextType = {
   documents: DocumentRef[]
-  open: (rawUrl: string) => void
-  download: (rawUrl: string) => void
-  remove: (rawUrl: string) => void
+  open: (rawUrl: string) => Promise<void>
+  download: (rawUrl: string) => Promise<void>
+  remove: (rawUrl: string) => Promise<void>
 }
 
 const defaultStoreContext: StoreContextType = {
@@ -91,7 +91,6 @@ const StoreContextProvider = (props: StoreContextProviderProps) => {
     if (platform === 'web') {
       throw new Error('Operación no permitida en versión Web');
     }
-    console.log(`Abriendo ${rawUrl}`);
     const docPath = availablePaths.find(p => p.url === rawUrl);
     if (!docPath) {
       throw new Error('Documento no ha sido descargado');
@@ -108,24 +107,19 @@ const StoreContextProvider = (props: StoreContextProviderProps) => {
     if (availablePaths.find(i => i.url === rawUrl)) {
       throw new Error('El documento ya fue descargado');
     }
-    console.log(`Iniciando descarga ${rawUrl}`);
     // Get data
     const fileHash = Md5.hashStr(rawUrl);
     const fileURL = rawUrl; // Validaciones
     const filePath = `${File.dataDirectory}${fileHash}.pdf`;
     // Download
-    try {
-      await HTTP.downloadFile(fileURL, {}, {}, filePath);
-      const newReference = {
-        url: rawUrl,
-        local: filePath
-      }
-      const next = availablePaths.concat([newReference]);
-      localStorage.setItem('PATHS', JSON.stringify(next));
-      setAvailablePaths(next);
-    } catch (err) {
-      console.error(err);
+    await HTTP.downloadFile(fileURL, {}, {}, filePath);
+    const newReference = {
+      url: rawUrl,
+      local: filePath
     }
+    const next = availablePaths.concat([newReference]);
+    localStorage.setItem('PATHS', JSON.stringify(next));
+    setAvailablePaths(next);
   }
 
   const removeDocument = async (rawUrl: string) => {
@@ -133,7 +127,6 @@ const StoreContextProvider = (props: StoreContextProviderProps) => {
     if (platform === 'web') {
       throw new Error('Operación no permitida en versión Web');
     }
-    console.log(`Eliminando ${rawUrl}`);
     const fileHash = Md5.hashStr(rawUrl);
     await File.removeFile(File.dataDirectory, `${fileHash}.pdf`)
     const next = availablePaths.filter(i => i.url !== rawUrl);
