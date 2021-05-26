@@ -104,8 +104,8 @@ const StoreContextProvider = (props: StoreContextProviderProps) => {
     }
     console.log(`Iniciando descarga ${rawUrl}`);
     // Get data
+    const fileHash = Md5.hashStr(rawUrl);
     const fileURL = rawUrl; // Validaciones
-    const fileHash = Md5.hashStr(fileURL);
     const filePath = `${File.dataDirectory}${fileHash}.pdf`;
     // Download
     try {
@@ -117,19 +117,19 @@ const StoreContextProvider = (props: StoreContextProviderProps) => {
       const next = availablePaths.concat([newReference]);
       localStorage.setItem('PATHS', JSON.stringify(next));
       setAvailablePaths(next);
-      // Open
-      await FileOpener.open(filePath, 'application/pdf');
     } catch (err) {
       console.error(err);
     }
   }
 
-  const removeDocument = (rawUrl: string) => {
+  const removeDocument = async (rawUrl: string) => {
     const platform = Capacitor.getPlatform();
     if (platform === 'web') {
       throw new Error('Operación no permitida en versión Web');
     }
     console.log(`Eliminando ${rawUrl}`);
+    const fileHash = Md5.hashStr(rawUrl);
+    await File.removeFile(File.dataDirectory, `${fileHash}.pdf`)
     const next = availablePaths.filter(i => i.url !== rawUrl);
     localStorage.setItem('PATHS', JSON.stringify(next));
     setAvailablePaths(next)
