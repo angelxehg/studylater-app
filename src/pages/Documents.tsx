@@ -9,9 +9,9 @@ const DocumentsPage = () => {
 
   const handleClick = (item: DocumentRef) => {
     if (item.offline) {
-      return () => open(item);
+      return () => open(item.url);
     } else {
-      return () => download(item);
+      return () => download(item.url);
     }
   }
 
