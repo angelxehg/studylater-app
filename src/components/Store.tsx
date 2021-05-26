@@ -1,9 +1,15 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useFirestore, useFirestoreDocData, useUser } from 'reactfire';
+import { Md5 } from 'ts-md5/dist/md5';
+import { Capacitor } from '@capacitor/core';
+import { HTTP } from '@ionic-native/http';
+import { File } from '@ionic-native/file';
+import { FileOpener } from '@ionic-native/file-opener';
 
 interface SimpleDocLink {
   name: string
   url: string
+  mime: string
 }
 
 interface MainDocModel {
@@ -74,21 +80,51 @@ const StoreContextProvider = (props: StoreContextProviderProps) => {
   const [documentItems, setDocumentItems] = useState<DocumentRef[]>([]);
   const [availablePaths, setAvailablePaths] = useState<DocumentPath[]>([]);
 
-  const openDocument = (d: DocumentRef) => {
+  const openDocument = async (d: DocumentRef) => {
+    const platform = Capacitor.getPlatform();
+    if (platform === 'web') {
+      throw new Error('Operación no permitida en versión Web');
+    }
     console.log(`Abriendo ${d.url}`);
   }
 
-  const downloadDocument = (d: DocumentRef) => {
-    console.log(`Descargando ${d.url}`);
-    const next = availablePaths.concat([{
-      url: d.url,
-      local: '...'
-    }]);
-    localStorage.setItem('PATHS', JSON.stringify(next));
-    setAvailablePaths(next);
+  const downloadDocument = async (d: DocumentRef) => {
+    const platform = Capacitor.getPlatform();
+    if (platform === 'web') {
+      throw new Error('Operación no permitida en versión Web');
+    }
+    if (availablePaths.find(i => i.url === d.url)) {
+      throw new Error('El documento ya fue descargado');
+    }
+    console.log(`Iniciando descarga ${d.url}`);
+    //
+    const fileURL = d.url; // Validaciones
+    const fileHash = Md5.hashStr(fileURL);
+    const filePath = `${File.dataDirectory}${fileHash}.pdf`;
+    // Download
+    try {
+      const downloadr = await HTTP.downloadFile(fileURL, {}, {}, filePath);
+      console.log(downloadr);
+      const newReference = {
+        url: d.url,
+        local: filePath
+      }
+      const next = availablePaths.concat([newReference]);
+      localStorage.setItem('PATHS', JSON.stringify(next));
+      setAvailablePaths(next);
+      // Open
+      const openr = await FileOpener.open(filePath, 'application/pdf');
+      console.log(openr);
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   const removeDocument = (d: DocumentRef) => {
+    const platform = Capacitor.getPlatform();
+    if (platform === 'web') {
+      throw new Error('Operación no permitida en versión Web');
+    }
     console.log(`Eliminando ${d.url}`);
     const next = availablePaths.filter(i => i.url !== d.url);
     localStorage.setItem('PATHS', JSON.stringify(next));
