@@ -19,13 +19,17 @@ const mainData: SimpleDocLink[] = [
     mime: "application/pdf",
     ext: ".pdf"
   },
-  {
-    name: "Ejemplo desde Google Drive",
-    url: "https://drive.google.com/file/d/10yftWZCU9NUgXurjEhXqsHCrzv1eJgkx/view?usp=sharing",
-    mime: "application/pdf",
-    ext: ".pdf"
-  },
-]
+];
+
+const transformURL = (rawURL: string) => {
+  let transformedURL = rawURL;
+  if (rawURL.includes('http://')) {
+    // URLs without https aren't allowed! This will try to use HTTPS
+    const fragment = rawURL.split('http://')[1];
+    transformedURL = `https://${fragment}`;
+  }
+  return transformedURL;
+}
 
 
 export interface DocumentRef {
@@ -109,8 +113,9 @@ const StoreContextProvider = (props: StoreContextProviderProps) => {
     }
     // Get data
     const fileHash = Md5.hashStr(rawUrl);
-    const fileURL = rawUrl; // Validaciones
+    const fileURL = transformURL(rawUrl);
     const filePath = `${File.dataDirectory}${fileHash}.pdf`;
+    console.log(fileURL);
     // Download
     await HTTP.downloadFile(fileURL, {}, {}, filePath);
     const newReference = {
