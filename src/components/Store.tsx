@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { useFirestore, useFirestoreDocData, useUser } from 'reactfire';
 import { Md5 } from 'ts-md5/dist/md5';
 import { Capacitor } from '@capacitor/core';
 import { HTTP } from '@ionic-native/http';
@@ -10,11 +9,23 @@ interface SimpleDocLink {
   name: string
   url: string
   mime: string
+  ext: string
 }
 
-interface MainDocModel {
-  documents?: SimpleDocLink[]
-}
+const mainData: SimpleDocLink[] = [
+  {
+    name: "Ejemplo desde FTP",
+    url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+    mime: "application/pdf",
+    ext: ".pdf"
+  },
+  {
+    name: "Ejemplo desde Google Drive",
+    url: "https://drive.google.com/file/d/10yftWZCU9NUgXurjEhXqsHCrzv1eJgkx/view?usp=sharing",
+    mime: "application/pdf",
+    ext: ".pdf"
+  },
+]
 
 
 export interface DocumentRef {
@@ -72,11 +83,6 @@ const getPaths = async (): Promise<DocumentPath[]> => {
 }
 
 const StoreContextProvider = (props: StoreContextProviderProps) => {
-  const { data: user } = useUser();
-  const mainDocRef = useFirestore()
-    .collection('studylater').doc(user.uid);
-  const { data: mainData } = useFirestoreDocData<MainDocModel>(mainDocRef);
-
   const [documentItems, setDocumentItems] = useState<DocumentRef[]>([]);
   const [availablePaths, setAvailablePaths] = useState<DocumentPath[]>([]);
 
@@ -140,20 +146,15 @@ const StoreContextProvider = (props: StoreContextProviderProps) => {
   }, []);
 
   useEffect(() => {
-    if (!mainData) {
-      return
-    }
-    if (mainData.documents) {
-      const availableUrls = availablePaths.map(i => i.url);
-      setDocumentItems(mainData.documents.map(item => {
-        return {
-          name: item.name,
-          url: item.url,
-          offline: availableUrls.includes(item.url),
-        }
-      }))
-    }
-  }, [mainData, availablePaths]);
+    const availableUrls = availablePaths.map(i => i.url);
+    setDocumentItems(mainData.map(item => {
+      return {
+        name: item.name,
+        url: item.url,
+        offline: availableUrls.includes(item.url),
+      }
+    }))
+  }, [availablePaths]);
 
   return (
     <StoreContext.Provider value={{
