@@ -11,7 +11,7 @@ function App() {
   return (
     <Container fluid className="pt-3 pb-3">
       <header>
-        <h1>StudyLater App v0.1.2</h1>
+        <h1>StudyLater App v0.2.0</h1>
         <p>Lleva contigo tus PDFs y estudia más tarde</p>
       </header>
       <AuthCheck fallback={<LoginPage />}>
